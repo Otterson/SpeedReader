@@ -1,11 +1,13 @@
 from tkinter import *
 from tkinter import filedialog
+from docx import Document
 import tkinter.font as tkFont
 import subprocess
 import sys
 import os 
 import time
 import pdftotext
+
 
 #TK root setup
 root = Tk()
@@ -91,13 +93,27 @@ def display_text(file_path):
         pdf = pdftotext.PDF(f)
         for page in pdf:
             for string in page.split():
-               # for string in line.split():
                 word.set(string)
                 word_label.configure(textvariable=word)
                 root.update()
                 if string[len(string)-1] == ".":
                     time.sleep(REFRESH_SPEED)
                 time.sleep(REFRESH_SPEED)
+    elif file_type == "docx" or file_type == "odt":
+        doc = Document(file_path)
+        fullText = []
+        for para in doc.paragraphs:
+            fullText.append(para.text)
+            print(para.text)
+        for para in fullText:
+            for string in para.split():
+                word.set(string)
+                word_label.configure(textvariable=word)
+                root.update()
+                if string[len(string)-1] == ".":
+                    time.sleep(REFRESH_SPEED)
+                time.sleep(REFRESH_SPEED)
+
        
 
     f.close()
