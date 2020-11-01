@@ -8,7 +8,7 @@ import os
 import time
 import pdftotext
 
-
+supported_file_types = {"pdf", "docx", "txt"}
 #TK root setup
 root = Tk()
 root.geometry("1280x720")
@@ -42,7 +42,7 @@ bottom_frame.pack(side = BOTTOM)
 
 #word label setup
 word = StringVar()
-word.set("TEST STRING")
+word.set("")
 word_label = Label(center_frame, textvariable = word, justify = CENTER, font = word_font)
 word_label.pack(pady = 200)
 
@@ -78,8 +78,6 @@ def display_text(file_path):
     f = open(file_path, 'rb')
     file_split = file_path.split(".")
     file_type = file_split[len(file_split)-1]
-    print(file_type)
-    print("File opened")
     if file_type == "txt":
         for line in f:
             for string in line.split():
@@ -99,12 +97,11 @@ def display_text(file_path):
                 if string[len(string)-1] == ".":
                     time.sleep(REFRESH_SPEED)
                 time.sleep(REFRESH_SPEED)
-    elif file_type == "docx" or file_type == "odt":
+    elif file_type == "docx":
         doc = Document(file_path)
         fullText = []
         for para in doc.paragraphs:
             fullText.append(para.text)
-            print(para.text)
         for para in fullText:
             for string in para.split():
                 word.set(string)
@@ -114,8 +111,6 @@ def display_text(file_path):
                     time.sleep(REFRESH_SPEED)
                 time.sleep(REFRESH_SPEED)
 
-       
-
     f.close()
 
 #used when entering filename to search
@@ -123,9 +118,15 @@ def open_file():
     file_path = filedialog.askopenfilename(initialdir = "/home/Documents", title = "Select File", filetypes=(("all files", "*.*"),("txt files", "*.txt")))
     filename = ""
     file_split = file_path.split("/")
-    filename_disp.set("Filename: " + file_split[len(file_split)-1])
-    filename_label.configure(textvariable = filename_disp)
-    display_text(file_path)
+    file_split2 = file_split[len(file_split)-1].split(".")
+    file_type = file_split2[1]
+    if file_type in supported_file_types:
+        filename_disp.set("Filename: " + file_split[len(file_split)-1])
+        filename_label.configure(textvariable = filename_disp)
+        display_text(file_path)
+    else:
+        filename_disp.set("Please select supported file type: pdf, docx, txt")
+        filename_label.configure(textvariable= filename_disp, fg = "red")
 
 #used to open file dialog to search file manually
 def search_file():
