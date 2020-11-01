@@ -5,8 +5,7 @@ import subprocess
 import sys
 import os 
 import time
-import PyPDF2
-
+import pdftotext
 
 #TK root setup
 root = Tk()
@@ -74,7 +73,7 @@ def speed_up():
 
 #main text read loop
 def display_text(file_path):
-    f = open(file_path)
+    f = open(file_path, 'rb')
     file_split = file_path.split(".")
     file_type = file_split[len(file_split)-1]
     print(file_type)
@@ -89,17 +88,26 @@ def display_text(file_path):
                     time.sleep(REFRESH_SPEED)
                 time.sleep(REFRESH_SPEED)
     elif file_type == "pdf":
-        pdfReader = PyPDF2.PdfFileReader(f)
-        num_pages = pdfReader.numPages
-        pageObj = pdfReader.getPage(0)
-        print(pageObj.extractText())
+        pdf = pdftotext.PDF(f)
+        for page in pdf:
+            for string in page.split():
+               # for string in line.split():
+                word.set(string)
+                word_label.configure(textvariable=word)
+                root.update()
+                if string[len(string)-1] == ".":
+                    time.sleep(REFRESH_SPEED)
+                time.sleep(REFRESH_SPEED)
+       
+
+    f.close()
 
 #used when entering filename to search
 def open_file():
     file_path = filedialog.askopenfilename(initialdir = "/home/Documents", title = "Select File", filetypes=(("all files", "*.*"),("txt files", "*.txt")))
     filename = ""
-    
-    filename_disp.set("Filename: " + file_path)
+    file_split = file_path.split("/")
+    filename_disp.set("Filename: " + file_split[len(file_split)-1])
     filename_label.configure(textvariable = filename_disp)
     display_text(file_path)
 
